@@ -1,3 +1,4 @@
+<!-- src/app/tab2/tab2.page.html -->
 <ion-header>
   <ion-toolbar>
     <ion-title>Photo Gallery</ion-title>
@@ -7,16 +8,22 @@
 <ion-content>
   <ion-grid>
     <ion-row>
-      <!-- *ngFor loops through the photos array from the PhotoService -->
-      <ion-col size="2" *ngFor="let photo of photoService.photos; index as position">
-        <ion-img [src]="photo.webviewPath" (click)="showActionSheet(photo, position)"></ion-img>
+      <!-- Add (click) handler here -->
+      <ion-col
+        size="3"
+        *ngFor="let photo of photoService.photos; index as position"
+        (click)="openImageModal(photo)"  
+      >
+        <ion-img
+          [src]="photo.webviewPath"
+          style="cursor: pointer;" 
+          ></ion-img> <!-- Optional: Add cursor style -->
       </ion-col>
     </ion-row>
   </ion-grid>
 
-  <!-- Floating Action Button (FAB) to trigger taking a new photo -->
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="photoService.addNewToGallery()">
+    <ion-fab-button (click)="addPhotoToGallery()"> <!-- Use the component method -->
       <ion-icon name="camera"></ion-icon>
     </ion-fab-button>
   </ion-fab>

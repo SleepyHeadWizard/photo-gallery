@@ -1,0 +1,46 @@
+<!-- src/app/components/image-detail-modal/image-detail-modal.component.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Photo View</ion-title>
+    <ion-buttons slot="end">
+      <!-- Close button -->
+      <ion-button (click)="closeModal()" color="danger" fill="clear">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" fullscreen>
+  <!-- Display the image -->
+  <!-- Make sure selectedPhoto and selectedPhoto.webviewPath exist -->
+  <ion-img
+    *ngIf="selectedPhoto && selectedPhoto.webviewPath"
+    [src]="selectedPhoto.webviewPath"
+    style="width: 100%; height: 80%; object-fit: contain;"
+  ></ion-img>
+  <!-- Add a placeholder if needed -->
+   <div *ngIf="!selectedPhoto || !selectedPhoto.webviewPath" style="text-align: center; margin-top: 20px;">
+     Could not load image.
+   </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+       <!-- Delete Button -->
+       <ion-button (click)="deletePhoto()" color="danger">
+         <ion-icon slot="start" name="trash"></ion-icon>
+         Delete
+       </ion-button>
+    </ion-buttons>
+
+    <!-- Placeholder for Narration Button (Part 3) -->
+    <ion-buttons slot="end">
+       <ion-button (click)="playNarration()" color="primary">
+         <ion-icon slot="start" name="play-circle"></ion-icon>
+         Narrate
+       </ion-button>
+    </ion-buttons>
+   </ion-toolbar>
+</ion-footer>
