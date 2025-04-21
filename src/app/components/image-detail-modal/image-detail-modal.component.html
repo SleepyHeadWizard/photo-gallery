@@ -1,10 +1,10 @@
 <!-- src/app/components/image-detail-modal/image-detail-modal.component.html -->
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary"> <!-- Optional: Add color -->
     <ion-title>Photo View</ion-title>
     <ion-buttons slot="end">
       <!-- Close button -->
-      <ion-button (click)="closeModal()" color="danger" fill="clear">
+      <ion-button (click)="closeModal()"> <!-- Standard close button -->
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -13,34 +13,84 @@
 
 <ion-content class="ion-padding" fullscreen>
   <!-- Display the image -->
-  <!-- Make sure selectedPhoto and selectedPhoto.webviewPath exist -->
-  <ion-img
-    *ngIf="selectedPhoto && selectedPhoto.webviewPath"
-    [src]="selectedPhoto.webviewPath"
-    style="width: 100%; height: 80%; object-fit: contain;"
-  ></ion-img>
-  <!-- Add a placeholder if needed -->
-   <div *ngIf="!selectedPhoto || !selectedPhoto.webviewPath" style="text-align: center; margin-top: 20px;">
-     Could not load image.
-   </div>
+  <div class="image-container ion-text-center">
+      <ion-img
+        *ngIf="selectedPhoto && selectedPhoto.webviewPath"
+        [src]="selectedPhoto.webviewPath"
+        alt="Selected photo"
+        class="displayed-image"
+      ></ion-img>
+      <!-- Placeholder if image fails to load -->
+      <div *ngIf="!selectedPhoto || !selectedPhoto.webviewPath" class="placeholder-text">
+        Could not load image.
+      </div>
+  </div>
+
+  <!-- Optional: Area to display the generated description text -->
+  <!-- You can uncomment this later if you want to show the text -->
+  <!--
+  <div *ngIf="generatedDescription" class="ion-padding-top description-text">
+    <ion-label>
+      <h2>Description:</h2>
+      <p>{{ generatedDescription }}</p>
+    </ion-label>
+  </div>
+  -->
+
 </ion-content>
 
-<ion-footer>
+<ion-footer class="ion-no-border"> <!-- Optional: Remove footer border -->
   <ion-toolbar>
     <ion-buttons slot="start">
        <!-- Delete Button -->
-       <ion-button (click)="deletePhoto()" color="danger">
+       <ion-button (click)="deletePhoto()" color="danger" fill="clear"> <!-- Clear style for less emphasis -->
          <ion-icon slot="start" name="trash"></ion-icon>
          Delete
        </ion-button>
     </ion-buttons>
 
-    <!-- Placeholder for Narration Button (Part 3) -->
+    <!-- Narration / Stop Button -->
     <ion-buttons slot="end">
-       <ion-button (click)="playNarration()" color="primary">
-         <ion-icon slot="start" name="play-circle"></ion-icon>
-         Narrate
+       <!-- Bindings (click, color, disabled, fill) are attributes of the ion-button tag -->
+       <ion-button
+         (click)="handleNarrationClick()"
+         [color]="isSpeaking ? 'warning' : 'primary'"
+         [disabled]="isNarrating && !isSpeaking"
+         fill="clear">
+           <!-- Content inside the button: spinner, icons, text -->
+           <ion-spinner *ngIf="isNarrating && !isSpeaking" name="dots" slot="start"></ion-spinner>
+           <ion-icon *ngIf="!isNarrating && !isSpeaking" slot="start" name="play-circle-outline"></ion-icon>
+           <ion-icon *ngIf="isSpeaking" slot="start" name="stop-circle-outline"></ion-icon>
+           {{ isNarrating && !isSpeaking ? 'Generating...' : (isSpeaking ? 'Stop' : 'Narrate') }}
        </ion-button>
     </ion-buttons>
    </ion-toolbar>
 </ion-footer>
+
+<!-- Optional CSS for better image display -->
+<style>
+  .image-container {
+    width: 100%;
+    /* Consider using flex properties on parent if needed, or adjusting height based on context */
+    /* height: 80%; */ /* Commented out, let content define height unless specific sizing needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px; /* Space below image */
+    min-height: 300px; /* Ensure a minimum height for the container */
+  }
+  .displayed-image {
+    max-width: 100%;
+    max-height: 70vh; /* Limit image height relative to viewport height */
+    object-fit: contain; /* Scale image while preserving aspect ratio */
+    display: block; /* Ensure image behaves like a block element */
+  }
+  .placeholder-text {
+      color: var(--ion-color-medium-shade);
+      margin-top: 20px; /* Add space if placeholder shows */
+  }
+  .description-text {
+      color: var(--ion-color-medium);
+      white-space: pre-wrap; /* Allow text wrapping */
+  }
+</style>
