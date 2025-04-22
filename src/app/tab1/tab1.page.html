@@ -1,17 +1,73 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
+<!-- src/app/tab1/tab1.page.html (Review - Should be correct from previous step) -->
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <!-- Conditional Content -->
+  <div *ngIf="!user; else loggedInContent">
+
+    <!-- Login Form -->
+    <ion-card>
+      <ion-card-header><ion-card-title>Login</ion-card-title></ion-card-header>
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" formControlName="email" required inputmode="email"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" formControlName="password" required></ion-input>
+          </ion-item>
+          <ion-button type="submit" expand="block" [disabled]="loginForm.invalid || isLoggingIn" class="ion-margin-top">
+             <ion-spinner *ngIf="isLoggingIn" name="dots" slot="start"></ion-spinner>
+             {{ isLoggingIn ? 'Logging in...' : 'Login' }}
+          </ion-button>
+        </ion-card-content>
+      </form>
+    </ion-card>
+
+    <!-- Registration Form -->
+    <ion-card>
+      <ion-card-header><ion-card-title>Register</ion-card-title></ion-card-header>
+      <form [formGroup]="registerForm" (ngSubmit)="register()">
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" formControlName="email" required inputmode="email"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password (min 6 chars)</ion-label>
+            <ion-input type="password" formControlName="password" required></ion-input>
+          </ion-item>
+          <ion-button type="submit" expand="block" [disabled]="registerForm.invalid || isRegistering" class="ion-margin-top" color="secondary">
+            <ion-spinner *ngIf="isRegistering" name="dots" slot="start"></ion-spinner>
+             {{ isRegistering ? 'Registering...' : 'Register' }}
+          </ion-button>
+        </ion-card-content>
+      </form>
+    </ion-card>
+
+  </div>
+
+  <!-- Logged In View -->
+  <ng-template #loggedInContent>
+    <ion-card>
+      <ion-card-header><ion-card-title>Welcome!</ion-card-title></ion-card-header>
+      <ion-card-content class="ion-text-center">
+        <p>You are logged in as:</p>
+        <p><strong>{{ user?.email }}</strong></p>
+        <p><small>UID: {{ user?.uid }}</small></p>
+        <ion-button expand="block" (click)="logout()" color="danger" class="ion-margin-top" [disabled]="isLoggingOut">
+          <ion-spinner *ngIf="isLoggingOut" name="dots" slot="start"></ion-spinner>
+           {{ isLoggingOut ? 'Logging out...' : 'Logout' }}
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </ng-template>
+
 </ion-content>

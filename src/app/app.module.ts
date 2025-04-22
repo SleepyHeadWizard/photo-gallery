@@ -2,35 +2,36 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-// --- Remove HttpClientModule import ---
-// import { HttpClientModule } from '@angular/common/http';
-
-// --- Import provideHttpClient and related functions ---
+// --- HttpClient Provider ---
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+
+// --- AngularFire Modules (Compat) ---
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';         // <-- Add Auth
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';   // <-- Add Storage
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore'; // <-- Add Firestore (Optional for metadata)
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
-  // --- Remove HttpClientModule from imports ---
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
-    AppRoutingModule
-    // HttpClientModule // <-- REMOVE THIS LINE
+    AppRoutingModule,
+    // --- Initialize Firebase ---
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAuthModule,
+    AngularFireStorageModule,
+    AngularFirestoreModule // Keep even if just for metadata later
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-
-    // --- Add HttpClient provider here ---
-    provideHttpClient(withInterceptorsFromDi()), // Recommended way
-
-     // If you don't need DI for interceptors (less common):
-    // provideHttpClient(),
+    // --- HttpClient Provider ---
+    provideHttpClient(withInterceptorsFromDi()),
   ],
   bootstrap: [AppComponent],
 })

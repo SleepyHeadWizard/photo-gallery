@@ -1,30 +1,115 @@
-<!-- src/app/tab2/tab2.page.html -->
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Photo Gallery</ion-title>
+
+<ion-header [translucent]="true"> 
+  <ion-toolbar color="primary">
+    <ion-title>Photo Gallery (Local)</ion-title>
+     
+     <ion-buttons slot="end">
+         <ion-button
+            (click)="uploadAll()"
+            [disabled]="photoService.isUploading || photoService.photos.length === 0"
+            aria-label="Upload all local photos to cloud storage"
+            title="Upload all local photos to Firebase Storage">
+          
+             <ion-spinner *ngIf="photoService.isUploading" name="dots" color="light"></ion-spinner>
+            
+             <ion-icon *ngIf="!photoService.isUploading" slot="icon-only" name="cloud-upload-outline" color="light"></ion-icon>
+         </ion-button>
+     </ion-buttons>
   </ion-toolbar>
+  
+   <ion-progress-bar
+      *ngIf="photoService.isUploading && photoService.uploadProgress !== null"
+      [value]="(photoService.uploadProgress ?? 0) / 100"
+      color="secondary"
+      aria-label="Upload progress">
+   </ion-progress-bar>
 </ion-header>
 
-<ion-content>
-  <ion-grid>
+<ion-content [fullscreen]="true" class="ion-padding"> 
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Local Gallery</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Display message if no photos -->
+  <div *ngIf="!photoService.photos || photoService.photos.length === 0" class="ion-text-center ion-padding empty-gallery-message">
+      <ion-icon name="images-outline" size="large" color="medium"></ion-icon>
+      <p>Your local gallery is empty.</p>
+      <p>Use the camera button below to add photos.</p>
+  </div>
+
+  <!-- Gallery Grid -->
+  <ion-grid *ngIf="photoService.photos.length > 0" fixed> <!-- Use fixed grid for better alignment -->
     <ion-row>
-      <!-- Add (click) handler here -->
+      <!-- Responsive columns -->
       <ion-col
-        size="3"
+        size="6"
+        size-md="4"
+        size-lg="3"
         *ngFor="let photo of photoService.photos; index as position"
-        (click)="openImageModal(photo)"  
+        (click)="openImageModal(photo)"
+        (keyup.enter)="openImageModal(photo)"
+        class="gallery-item"
+        tabindex="0" 
+        role="button" 
+        [attr.aria-label]="'View photo ' + (position + 1)"
       >
-        <ion-img
-          [src]="photo.webviewPath"
-          style="cursor: pointer;" 
-          ></ion-img> <!-- Optional: Add cursor style -->
+        <!-- Use ion-card for better structure and potential actions later -->
+        <ion-card class="photo-card">
+           <ion-img
+             [src]="photo.webviewPath"
+             [alt]="'Photo ' + (position + 1)"
+             class="gallery-image"
+             (ionError)="handleImageError($event, photo)" ></ion-img>
+        </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>
 
+  <!-- FAB to add photos locally -->
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="addPhotoToGallery()"> <!-- Use the component method -->
+    <ion-fab-button (click)="addPhotoToGallery()" title="Add New Photo Locally" aria-label="Add new photo">
       <ion-icon name="camera"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
 </ion-content>
+
+<!-- Optional: Add some basic styling -->
+<style>
+  .empty-gallery-message {
+    margin-top: 30vh; /* Center vertically */
+    transform: translateY(-50%);
+    color: var(--ion-color-medium);
+  }
+  .gallery-item {
+      padding: 4px; /* Spacing around columns */
+  }
+  .photo-card {
+      margin: 0; /* Remove default card margin */
+      width: 100%;
+      height: 160px; /* Consistent height for cards */
+      cursor: pointer;
+      overflow: hidden; /* Ensure image fits card */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      display: flex; /* Align image within card */
+      align-items: center;
+      justify-content: center;
+  }
+   .photo-card:focus {
+      outline: 2px solid var(--ion-color-primary); /* Focus indicator */
+      outline-offset: 2px;
+   }
+  .gallery-item:hover .photo-card {
+       transform: translateY(-3px); /* Slight lift on hover */
+       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  .gallery-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Cover the card area */
+  }
+</style>
