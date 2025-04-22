@@ -32,17 +32,17 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Display message if no photos -->
+
   <div *ngIf="!photoService.photos || photoService.photos.length === 0" class="ion-text-center ion-padding empty-gallery-message">
       <ion-icon name="images-outline" size="large" color="medium"></ion-icon>
       <p>Your local gallery is empty.</p>
       <p>Use the camera button below to add photos.</p>
   </div>
 
-  <!-- Gallery Grid -->
-  <ion-grid *ngIf="photoService.photos.length > 0" fixed> <!-- Use fixed grid for better alignment -->
+  
+  <ion-grid *ngIf="photoService.photos.length > 0" fixed> 
     <ion-row>
-      <!-- Responsive columns -->
+     
       <ion-col
         size="6"
         size-md="4"
@@ -55,7 +55,7 @@
         role="button" 
         [attr.aria-label]="'View photo ' + (position + 1)"
       >
-        <!-- Use ion-card for better structure and potential actions later -->
+      
         <ion-card class="photo-card">
            <ion-img
              [src]="photo.webviewPath"
@@ -67,7 +67,7 @@
     </ion-row>
   </ion-grid>
 
-  <!-- FAB to add photos locally -->
+  
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
     <ion-fab-button (click)="addPhotoToGallery()" title="Add New Photo Locally" aria-label="Add new photo">
       <ion-icon name="camera"></ion-icon>
@@ -76,40 +76,40 @@
 
 </ion-content>
 
-<!-- Optional: Add some basic styling -->
+
 <style>
   .empty-gallery-message {
-    margin-top: 30vh; /* Center vertically */
+    margin-top: 30vh;
     transform: translateY(-50%);
     color: var(--ion-color-medium);
   }
   .gallery-item {
-      padding: 4px; /* Spacing around columns */
+      padding: 4px;
   }
   .photo-card {
-      margin: 0; /* Remove default card margin */
+      margin: 0;
       width: 100%;
-      height: 160px; /* Consistent height for cards */
+      height: 160px; 
       cursor: pointer;
-      overflow: hidden; /* Ensure image fits card */
+      overflow: hidden; 
       box-shadow: 0 2px 5px rgba(0,0,0,0.15);
       transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      display: flex; /* Align image within card */
+      display: flex; 
       align-items: center;
       justify-content: center;
   }
    .photo-card:focus {
-      outline: 2px solid var(--ion-color-primary); /* Focus indicator */
+      outline: 2px solid var(--ion-color-primary); 
       outline-offset: 2px;
    }
   .gallery-item:hover .photo-card {
-       transform: translateY(-3px); /* Slight lift on hover */
+       transform: translateY(-3px); 
        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   }
   .gallery-image {
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover; /* Cover the card area */
+      object-fit: cover; 
   }
 </style>

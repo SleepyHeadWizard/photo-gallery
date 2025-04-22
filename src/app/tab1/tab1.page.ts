@@ -67,7 +67,7 @@ export class Tab1Page implements OnInit, OnDestroy {
 
 
   async register() {
-    // Prevent submission if form is invalid or already registering
+
     if (this.registerForm.invalid || this.isRegistering) {
       if (!this.isRegistering) this.showToast('Please enter valid email and password (min 6 chars).');
       return;
@@ -77,29 +77,29 @@ export class Tab1Page implements OnInit, OnDestroy {
     const { email, password } = this.registerForm.value;
 
     try {
-      // Call Firebase Auth to create a new user
+     
       const credential = await this.afAuth.createUserWithEmailAndPassword(email, password);
       console.log('Registered successfully:', credential.user);
       this.showToast('Registration successful!');
-      this.registerForm.reset(); // Clear form on success
+      this.registerForm.reset(); 
     } catch (error: any) {
       console.error('Registration Error:', error);
-      // Provide specific feedback if possible, otherwise generic message
+    
       this.showToast(`Registration failed: ${error.code === 'auth/email-already-in-use' ? 'Email already exists.' : error.message}`);
     } finally {
-      this.isRegistering = false; // Reset loading state
+      this.isRegistering = false;
     }
   }
 
 
   async login() {
-    // Prevent submission if form is invalid or already logging in
+    // Prevent submission 
     if (this.loginForm.invalid || this.isLoggingIn) {
        if (!this.isLoggingIn) this.showToast('Please enter valid email and password.');
       return;
     }
 
-    this.isLoggingIn = true; // Set loading state
+    this.isLoggingIn = true; 
     const { email, password } = this.loginForm.value;
 
     try {

@@ -1,4 +1,4 @@
-<!-- src/app/tab1/tab1.page.html (Review - Should be correct from previous step) -->
+
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>Login</ion-title>
@@ -7,7 +7,7 @@
 
 <ion-content class="ion-padding">
 
-  <!-- Conditional Content -->
+ 
   <div *ngIf="!user; else loggedInContent">
 
     <!-- Login Form -->
@@ -54,7 +54,7 @@
 
   </div>
 
-  <!-- Logged In View -->
+  <!-- Logged in -->
   <ng-template #loggedInContent>
     <ion-card>
       <ion-card-header><ion-card-title>Welcome!</ion-card-title></ion-card-header>

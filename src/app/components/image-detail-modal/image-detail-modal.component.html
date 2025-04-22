@@ -1,10 +1,9 @@
-<!-- src/app/components/image-detail-modal/image-detail-modal.component.html -->
 <ion-header>
-  <ion-toolbar color="primary"> <!-- Optional: Add color -->
+  <ion-toolbar color="primary"> 
     <ion-title>Photo View</ion-title>
     <ion-buttons slot="end">
-      <!-- Close button -->
-      <ion-button (click)="closeModal()"> <!-- Standard close button -->
+     
+      <ion-button (click)="closeModal()"> 
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -12,7 +11,7 @@
 </ion-header>
 
 <ion-content class="ion-padding" fullscreen>
-  <!-- Display the image -->
+ 
   <div class="image-container ion-text-center">
       <ion-img
         *ngIf="selectedPhoto && selectedPhoto.webviewPath"
@@ -20,7 +19,7 @@
         alt="Selected photo"
         class="displayed-image"
       ></ion-img>
-      <!-- Placeholder if image fails to load -->
+      
       <div *ngIf="!selectedPhoto || !selectedPhoto.webviewPath" class="placeholder-text">
         Could not load image.
       </div>
@@ -39,25 +38,25 @@
 
 </ion-content>
 
-<ion-footer class="ion-no-border"> <!-- Optional: Remove footer border -->
+<ion-footer class="ion-no-border"> 
   <ion-toolbar>
     <ion-buttons slot="start">
-       <!-- Delete Button -->
-       <ion-button (click)="deletePhoto()" color="danger" fill="clear"> <!-- Clear style for less emphasis -->
+       
+       <ion-button (click)="deletePhoto()" color="danger" fill="clear"> 
          <ion-icon slot="start" name="trash"></ion-icon>
          Delete
        </ion-button>
     </ion-buttons>
 
-    <!-- Narration / Stop Button -->
+ 
     <ion-buttons slot="end">
-       <!-- Bindings (click, color, disabled, fill) are attributes of the ion-button tag -->
+      
        <ion-button
          (click)="handleNarrationClick()"
          [color]="isSpeaking ? 'warning' : 'primary'"
          [disabled]="isNarrating && !isSpeaking"
          fill="clear">
-           <!-- Content inside the button: spinner, icons, text -->
+           
            <ion-spinner *ngIf="isNarrating && !isSpeaking" name="dots" slot="start"></ion-spinner>
            <ion-icon *ngIf="!isNarrating && !isSpeaking" slot="start" name="play-circle-outline"></ion-icon>
            <ion-icon *ngIf="isSpeaking" slot="start" name="stop-circle-outline"></ion-icon>
@@ -67,30 +66,29 @@
    </ion-toolbar>
 </ion-footer>
 
-<!-- Optional CSS for better image display -->
+
 <style>
   .image-container {
     width: 100%;
-    /* Consider using flex properties on parent if needed, or adjusting height based on context */
-    /* height: 80%; */ /* Commented out, let content define height unless specific sizing needed */
+
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px; /* Space below image */
-    min-height: 300px; /* Ensure a minimum height for the container */
+    margin-bottom: 10px;
+    min-height: 300px; 
   }
   .displayed-image {
     max-width: 100%;
-    max-height: 70vh; /* Limit image height relative to viewport height */
-    object-fit: contain; /* Scale image while preserving aspect ratio */
-    display: block; /* Ensure image behaves like a block element */
+    max-height: 70vh; 
+    object-fit: contain;
+    display: block; 
   }
   .placeholder-text {
       color: var(--ion-color-medium-shade);
-      margin-top: 20px; /* Add space if placeholder shows */
+      margin-top: 20px; 
   }
   .description-text {
       color: var(--ion-color-medium);
-      white-space: pre-wrap; /* Allow text wrapping */
+      white-space: pre-wrap;
   }
 </style>

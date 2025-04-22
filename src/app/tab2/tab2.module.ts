@@ -1,4 +1,3 @@
-// src/app/tab2/tab2.module.ts (Ensure it looks like this)
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';

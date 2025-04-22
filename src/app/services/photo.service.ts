@@ -1,7 +1,7 @@
-// src/app/services/photo.service.ts
+
 import { Injectable } from '@angular/core';
 import { Platform, ToastController } from '@ionic/angular'; // Import ToastController
-import { Filesystem, Directory, ReadFileResult } from '@capacitor/filesystem'; // Import ReadFileResult
+import { Filesystem, Directory, ReadFileResult } from '@capacitor/filesystem'; 
 import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
@@ -9,88 +9,73 @@ import { Capacitor } from '@capacitor/core';
 // --- Firebase Imports ---
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFireStorage, AngularFireUploadTask } from '@angular/fire/compat/storage';
-import { AngularFirestore } from '@angular/fire/compat/firestore'; // Optional for metadata
-import firebase from 'firebase/compat/app'; // For Timestamp type
-import { firstValueFrom } from 'rxjs'; // For awaiting currentUser
+import { AngularFirestore } from '@angular/fire/compat/firestore'; 
+import firebase from 'firebase/compat/app'; 
+import { firstValueFrom } from 'rxjs'; 
 
-// --- AiService Import (for deleting descriptions if needed - we removed this from deletePicture previously) ---
-// import { AiService } from './ai.service'; // Uncomment if you need AiService here again
-
-// --- Interface ---
 export interface UserPhoto {
-  filepath: string; // Native URI or filename for web
-  webviewPath?: string; // Path used by <img> tag
+  filepath: string; 
+  webviewPath?: string; 
 }
 
-// Optional: Interface for metadata in Firestore
+
 interface UploadedPhotoMetadata {
   userId: string;
-  originalFilepath: string; // Store the original local path for reference
-  storagePath: string; // Path in Cloud Storage
-  // downloadURL?: string; // Optional: URL might not be needed immediately
-  uploadedAt: firebase.firestore.FieldValue; // Use server timestamp
-}
+  originalFilepath: string; 
+  storagePath: string; 
+  uploadedAt: firebase.firestore.FieldValue; }
 
 @Injectable({ providedIn: 'root' })
 export class PhotoService {
-  public photos: UserPhoto[] = []; // Holds locally managed photos
-  private PHOTO_STORAGE: string = 'photos'; // Key for Preferences
+  public photos: UserPhoto[] = []; 
+  private PHOTO_STORAGE: string = 'photos'; 
   private platform: Platform;
-  public uploadProgress: number | null = null; // For progress display (0 to 100)
-  public isUploading = false; // Flag to prevent multiple uploads
+  public uploadProgress: number | null = null; 
+  public isUploading = false; 
 
   constructor(
     platform: Platform,
-    private afAuth: AngularFireAuth,         // Inject Firebase Auth
-    private afStorage: AngularFireStorage, // Inject Cloud Storage
-    private afs: AngularFirestore,         // Inject Firestore (Optional for metadata)
-    private toastCtrl: ToastController,      // Inject ToastController for messages
-    // private aiService: AiService // Inject if needed again
+    private afAuth: AngularFireAuth,         
+    private afStorage: AngularFireStorage,
+    private afs: AngularFirestore,
+    private toastCtrl: ToastController,      
+    
   ) {
     this.platform = platform;
-    // It's generally better to load data within the component (e.g., ngOnInit)
-    // this.loadSaved();
+    
   }
 
-  /**
-   * Loads saved photos from Preferences (local storage).
-   * Should be called by components when needed (e.g., ngOnInit).
-   */
   public async loadSaved() {
     console.log("PhotoService: Loading photos from Preferences...");
     const { value } = await Preferences.get({ key: this.PHOTO_STORAGE });
     this.photos = (value ? JSON.parse(value) : []) as UserPhoto[];
     console.log(`PhotoService: Loaded ${this.photos.length} photos.`);
 
-    // Generate webview paths for web platform
+ 
     if (!this.platform.is('hybrid')) {
       console.log("PhotoService: Generating webview paths for web...");
       for (let photo of this.photos) {
-        // Check if webviewPath already exists (e.g., from previous session)
-        if (!photo.webviewPath?.startsWith('data:')) { // Re-generate if not a data URL
+
+        if (!photo.webviewPath?.startsWith('data:')) { 
             try {
                 const readFile = await Filesystem.readFile({
-                    path: photo.filepath, // filename on web
+                    path: photo.filepath, 
                     directory: Directory.Data
                 });
                 photo.webviewPath = `data:image/jpeg;base64,${readFile.data}`;
             } catch (error) {
                 console.error(`Error reading file ${photo.filepath} for webview:`, error);
-                // Optionally filter out this photo or mark it as unloadable
-                // this.photos = this.photos.filter(p => p.filepath !== photo.filepath);
-                photo.webviewPath = undefined; // Mark as unloadable
+                
+                photo.webviewPath = undefined; 
             }
         }
       }
        console.log("PhotoService: Webview paths generated.");
     }
-    // Ensure photos array update triggers change detection if needed elsewhere
+  
     this.photos = [...this.photos];
   }
 
-  /**
-   * Adds a new photo taken with the camera to local storage.
-   */
   public async addNewToGallery() {
     try {
       const capturedPhoto = await Camera.getPhoto({
@@ -99,10 +84,10 @@ export class PhotoService {
         quality: 90
       });
       const savedImageFile = await this.savePictureLocally(capturedPhoto);
-      this.photos.unshift(savedImageFile); // Add to beginning
+      this.photos.unshift(savedImageFile);
       await Preferences.set({
         key: this.PHOTO_STORAGE,
-        value: JSON.stringify(this.photos), // Save updated array
+        value: JSON.stringify(this.photos), 
       });
       console.log('PhotoService: New photo added locally.', savedImageFile.filepath);
     } catch (error) {
@@ -111,36 +96,32 @@ export class PhotoService {
     }
   }
 
-  /**
-   * Saves a picture file locally to the device's filesystem.
-   */
+
   private async savePictureLocally(photo: Photo): Promise<UserPhoto> {
     const base64Data = await this.readCapturedPhotoAsBase64(photo);
     const fileName = Date.now() + '.jpeg';
     const savedFile = await Filesystem.writeFile({
       path: fileName,
       data: base64Data,
-      directory: Directory.Data // Use Data directory for persistent private app storage
+      directory: Directory.Data 
     });
 
     if (this.platform.is('hybrid')) {
-      // Native platform: Use file URI and Capacitor's conversion for webview
+      
       return {
         filepath: savedFile.uri,
         webviewPath: Capacitor.convertFileSrc(savedFile.uri),
       };
     } else {
-      // Web platform: Use filename and the blob URL from camera for webview
+      
       return {
         filepath: fileName,
-        webviewPath: photo.webPath! // webPath is crucial for web display
+        webviewPath: photo.webPath! 
       };
     }
   }
 
-  /**
-   * Deletes a picture from local storage and filesystem.
-   */
+
   public async deletePicture(photo: UserPhoto) {
     const photoIndex = this.photos.findIndex(p => p.filepath === photo.filepath);
     if (photoIndex === -1) {
@@ -149,10 +130,10 @@ export class PhotoService {
     }
 
     const filepathToDelete = this.photos[photoIndex].filepath;
-    this.photos.splice(photoIndex, 1); // Remove from runtime array
-    await Preferences.set({ key: this.PHOTO_STORAGE, value: JSON.stringify(this.photos) }); // Update local cache
+    this.photos.splice(photoIndex, 1);
+    await Preferences.set({ key: this.PHOTO_STORAGE, value: JSON.stringify(this.photos) }); 
 
-    try { // Delete local file
+    try {
       const filename = filepathToDelete.substring(filepathToDelete.lastIndexOf('/') + 1);
       await Filesystem.deleteFile({ path: filename, directory: Directory.Data });
       console.log('PhotoService: Deleted local file:', filename);
@@ -160,27 +141,28 @@ export class PhotoService {
       console.error('PhotoService: Error deleting local file:', filepathToDelete, error);
     }
 
-    // Note: As per Suggestion 1, we are NOT deleting the Firestore description here automatically.
-    // If you implemented Suggestion 1 fully, you would call:
-    // this.aiService.deleteDescription(filepathToDelete).catch(...);
+  
   }
 
 
-  // --- NEW METHOD: Upload All Local Photos to Firebase Storage ---
+ 
   async uploadAllPhotosToFirebase() {
     if (this.isUploading) {
       this.showToast('Upload already in progress.');
       return;
     }
-    // Reload local photos first to ensure we have the latest list
+
     await this.loadSaved();
     if (this.photos.length === 0) {
       this.showToast('No photos in the local gallery to upload.');
       return;
     }
 
-    // Get current user - essential for associating uploads and setting rules
-    const user = await firstValueFrom(this.afAuth.authState); // Use firstValueFrom for promise
+    
+
+
+    //firebase upload section
+    const user = await firstValueFrom(this.afAuth.authState); 
 
     if (!user) {
       this.showToast('Please log in (Tab 1) before uploading photos.');
@@ -189,16 +171,16 @@ export class PhotoService {
     const userId = user.uid;
     console.log(`PhotoService: Starting upload for user: ${userId}`);
     this.isUploading = true;
-    this.uploadProgress = 0; // Initialize progress
+    this.uploadProgress = 0; 
 
     let successfulUploads = 0;
     const totalPhotos = this.photos.length;
-    const timestamp = Date.now(); // Consistent timestamp for this batch
+    const timestamp = Date.now(); 
 
-    // Process uploads one by one (sequential)
+    
     for (let i = 0; i < totalPhotos; i++) {
       const photo = this.photos[i];
-      // Update overall progress for UI (0 to 100)
+      
       this.uploadProgress = ((i + 1) / totalPhotos) * 100;
 
       // Create a unique filename for Cloud Storage
@@ -259,8 +241,7 @@ export class PhotoService {
       } catch (error) {
         console.error(`Failed to upload photo ${photo.filepath}:`, error);
         this.showToast(`Error uploading ${baseFilename}`);
-        // Consider breaking the loop or continuing with next photo
-        // break; // Uncomment to stop on first error
+      
       }
     } // End loop
 
@@ -306,4 +287,4 @@ export class PhotoService {
     reader.readAsDataURL(blob);
   });
 
-} // End PhotoService class
+} 
